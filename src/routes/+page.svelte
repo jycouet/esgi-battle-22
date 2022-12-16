@@ -1,31 +1,46 @@
 <script lang="ts">
 	import { fly, crossfade } from 'svelte/transition';
 	import { backInOut } from 'svelte/easing';
+	import { todos } from '$lib/todos';
 
 	const [send, receive] = crossfade({});
 
-	let todos: { id: string; title: string; done: boolean }[] = [
-		{
-			id: crypto.randomUUID(),
-			title: 'Learn Svelte',
-			done: false
-		},
-		{
-			id: crypto.randomUUID(),
-			title: 'Hello?',
-			done: false
-		}
-	];
+	// let todos: { id: string; title: string; done: boolean; prio: 'HIGH' | 'LOW' }[] = [
+	// 	{
+	// 		id: crypto.randomUUID(),
+	// 		title: 'Learn Svelte',
+	// 		done: false,
+	// 		prio: 'HIGH'
+	// 	},
+	// 	{
+	// 		id: crypto.randomUUID(),
+	// 		title: 'Hello?',
+	// 		done: false,
+	// 		prio: 'HIGH'
+	// 	}
+	// ];
 
-	$: todosNotDone = todos.filter((todo) => !todo.done);
-	$: todosDone = todos.filter((todo) => todo.done);
+	$: todosNotDone = $todos.filter(
+		(todo) =>
+			!todo.done &&
+			(stateToShow === 'ALL' ||
+				(stateToShow === 'HIGH' && todo.prio === 'HIGH') ||
+				(stateToShow === 'LOW' && todo.prio === 'LOW'))
+	);
+	$: todosDone = $todos.filter((todo) => todo.done);
+
+	let stateToShow: 'ALL' | 'HIGH' | 'LOW' = 'ALL';
+
+	const getPos = (id: string) => {
+		return $todos.findIndex((todo) => todo.id === id);
+	};
 
 	let value = '';
 	let message = '';
 
 	const submit = (e: Event) => {
 		if (value !== '') {
-			todos = [...todos, { id: crypto.randomUUID(), title: value, done: false }];
+			todos = [...todos, { id: crypto.randomUUID(), title: value, done: false, prio: 'LOW' }];
 			value = '';
 			message = '';
 		} else {
@@ -47,10 +62,20 @@
 <div class="flex">
 	<div class="column">
 		<h4>Todo</h4>
+
+		<select bind:value={stateToShow}>
+			<option value="ALL">ALL</option>
+			<option value="LOW">LOW</option>
+			<option value="HIGH">HIGH</option>
+		</select>
+		<!-- <button on:click={() => (stateToShow = 'LOW')}>Only LOW</button>
+		<button on:click={() => (stateToShow = 'HIGH')}>Only HIGH</button> -->
+
 		{#each todosNotDone as { title, done, id } (id)}
 			<div class="flex flex-item" in:receive={{ key: id }} out:send={{ key: id }}>
 				<input {id} type="checkbox" bind:checked={done} />
 				<input type="text" bind:value={title} />
+				<img src={`https://picsum.photos/id/${getPos(id)}/20`} alt="mon" />
 				<!-- <label for={id}>{title}</label> -->
 			</div>
 		{:else}
@@ -66,6 +91,7 @@
 			<p transition:fly={{ easing: backInOut, x: -150 }} style="color: red">{message}</p>
 		{/if}
 	</div>
+
 	<div class="column">
 		<h4>Done</h4>
 		{#each todosDone as { title, done, id } (id)}
