@@ -53,9 +53,13 @@
 				<input type="text" bind:value={title} />
 				<!-- <label for={id}>{title}</label> -->
 			</div>
+		{:else}
+			<div>
+				<b> Well done 🚀 </b>
+			</div>
 		{/each}
 		<form on:submit={submit} class="flex">
-			<input bind:value style="width: 120px;" />
+			<input bind:value style="width: 120px;" placeholder="Enter a title..." />
 			<button>Add</button>
 		</form>
 		{#if message}
@@ -92,5 +96,9 @@
 		width: 50%;
 		background: rgba(0, 0, 0, 0.2);
 		border-radius: 0.5rem;
+	}
+
+	input {
+		border: 0.1px solid #fff;
 	}
 </style>
