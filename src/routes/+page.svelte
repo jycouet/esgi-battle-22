@@ -48,13 +48,14 @@
 	<div class="column">
 		<h4>Todo</h4>
 		{#each todosNotDone as { title, done, id } (id)}
-			<div in:receive={{ key: id }} out:send={{ key: id }}>
+			<div class="flex flex-item" in:receive={{ key: id }} out:send={{ key: id }}>
 				<input {id} type="checkbox" bind:checked={done} />
-				<label for={id}>{title}</label>
+				<input type="text" bind:value={title} />
+				<!-- <label for={id}>{title}</label> -->
 			</div>
 		{/each}
 		<form on:submit={submit} class="flex">
-			<input bind:value />
+			<input bind:value style="width: 120px;" />
 			<button>Add</button>
 		</form>
 		{#if message}
@@ -64,10 +65,13 @@
 	<div class="column">
 		<h4>Done</h4>
 		{#each todosDone as { title, done, id } (id)}
-			<div in:receive={{ key: id }} out:send={{ key: id }}>
+			<div class="flex flex-item" in:receive={{ key: id }} out:send={{ key: id }}>
 				<input {id} type="checkbox" bind:checked={done} />
-				<label for={id}>{title}</label>
+				<input type="text" bind:value={title} />
+				<!-- <label for={id}>{title}</label> -->
 			</div>
+		{:else}
+			<i>Nothing done yet! </i>
 		{/each}
 	</div>
 </div>
@@ -76,6 +80,10 @@
 	.flex {
 		display: flex;
 		margin-top: 0.5rem;
+	}
+
+	.flex-item {
+		align-items: center;
 	}
 
 	.column {
